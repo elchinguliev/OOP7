@@ -1,244 +1,122 @@
-
-
-
-#include <stdlib.h>
 #include <iostream>
 #include <assert.h>
 
 using namespace std;
 
+//Task 
+// Class DynamicArray (template<class t>)
+// Example: DynamicArray<double> da;
+// Copy Constructor, Copy Assignment operator, Default Constructor
+// [] operator overloading
+// AddElementToEnd
+// AddElementToHead
+// AddElementByIndex
+// DeleteElementByIndex
+// Print()
 
+template <class T>
+class DynamicArray {
+	T* arr = nullptr;
+	int size = 0;
 
-class int_vec {
-private:
-    int capacity; 
-    int* arr;    
-    int size;     
 public:
+	DynamicArray() = default;
 
-  
-    int_vec()
-        : capacity(10), arr(new int[capacity]), size(0)
-    { }
+	DynamicArray(const DynamicArray& da) {
+		if (da.size == 0) {
+			arr = nullptr;
+			size = 0;
+			return;
+		}
+		arr = new T[da.size];
+		size = da.size;
+		for (int i = 0; i < size; i++) {
+			arr[i] = da.arr[i];
+		}
+	}
 
-    int_vec(int sz, int fill_value)
-        : capacity(10), size(sz)
-    {
-        if (size < 0) cout<<("can't construct int_vec of negative size");
-        if (size > capacity) capacity += size;
-        arr = new int[capacity];
-        for (int i = 0; i < size; ++i) {
-            arr[i] = fill_value;
-        }
-    }
+	DynamicArray& operator=(const DynamicArray& da) {
+		delete[] arr;
+		if (da.size == 0) {
+			arr = nullptr;
+			size = 0;
+			return *this;
+		}
 
-    // Copy constructor
-    int_vec(const int_vec& other)
-        : capacity(other.capacity), arr(new int[capacity]), size(other.size)
-    {
-        for (int i = 0; i < size; ++i) {
-            arr[i] = other.arr[i];
-        }
-    }
+		arr = new T[da.size];
+		size = da.size;
+		for (int i = 0; i < size; i++) {
+			arr[i] = da.arr[i];
+		}
+		return *this;
+	}
 
-    //Copy assigment operators
+	T& operator[](int index) {
+		assert(size > 0);
+		return arr[index];
+	}
 
-      int_vec& operator=(const int_vec& other) {
-          SetCapacity(other.capacity);
-          SetArr(other.arr);
-          SetSize(other.size);
-          return *this;
-    }
-      int_vec& operator+(const int_vec& other) {
-          SetCapacity(other.capacity);
-          SetArr(other.arr);
-          SetSize(other.size);
-          return *this;
-      }
-      int_vec& operator-(const int_vec& other) {
-          SetCapacity(other.capacity);
-          SetArr(other.arr);
-          SetSize(other.size);
-          return *this;
-      }
+	void AddElementToEnd(T value) {
+		T* temp = new T[size + 1];
+		for (int i = 0; i < size; i++)
+			temp[i] = arr[i];
+		temp[size] = value;
+		delete[] arr;
+		size++;
+		arr = temp;
+		temp = nullptr;
+	}
 
+	void AddElementToHead(T value) {
+		T* temp = new T[size + 1];
+		temp[0] = value;
+		for (int i = 0; i < size; i++) {
+			temp[i + 1] = arr[i];
+		}
 
+		delete[] arr;
+		size++;
+		arr = temp;
+		temp = nullptr;
+	}
 
-    ~int_vec() {
-        delete[] arr;
-    }
+	void AddElementByIndex(int index, T value) {
+		T* temp = new T[size + 1];
+		for (int i = 0; i < index; i++) {
+			temp[i] = arr[i];
+		}
 
-    int get_size() const {
-        return size;
-    }
+		temp[index] = value;
 
-    int get_capacity() const {
-        return capacity;
-    }
-
-    int get(int i) const {
-        if (i < 0 || i > size) cout<<("get: index out of range");
-        return arr[i];
-    }
-
-    void SetCapacity(int capacity) {
-        this -> capacity = capacity;
-    }
-    void SetArr(int *arr) {
-        this->arr = arr;
-    }
-    void SetSize(int size) {
-        this->size = size;
-    }
-
-    void set(int i, int x) {
-        if (i < 0 || i > size) cout << ("get: index out of range");
-        arr[i] = x;
-    }
-
-
-        void addElementToStart(int elem) {
-        int* temp = new int[size + 1];
-        temp[0] = elem;
-        for (int i = 0; i < size; i++) {
-            temp[i + 1] = arr[i];
-        }
-        temp[size] = elem;
-        delete[] arr;
-        arr = temp;
-        temp = nullptr;
-        size++;
-    }
-        void addElementToEnd(int elem) {
-            int* temp = new int[size + 1];
-            for (int i = 0; i < size; i++) {
-                temp[i] = arr[i];
-            }
-            temp[size] = elem;
-            delete[] arr;
-            arr = temp;
-            temp = nullptr;
-            size++;
-        }
-
-
-        void AddElementByIndex(int elem,int index) {
-           
-            int *temp = new int[size + 1];
-            for (size_t i = 0; i < size; i++)
-            {
-                temp[i] = arr[i];
-            }
-            temp[index] = elem;
-            delete[]arr;
-            arr = temp;
-            temp = nullptr;
-            size++;
-
-        }
+		for (int i = index; i < size; i++) {
+			temp[i + 1] = arr[i];
+		}
+		delete[] arr;
+		size++;
+		arr = temp;
+		temp = nullptr;
+	}
 
 
 
-        //void DeleteElementByIndex( int elem) {
-        //    int index = -1;
+	// DeleteElementByIndex
 
-        //    for (size_t i = 0; i < size; i++)
-        //    {
-        //        if (i == index) {
-        //            index = i;
-        //            break;
-        //        }
-        //    }
-        //    if (index != -1) {
-        //        int_vec** temp = new int_vec * [size - 1];
-        //        for (size_t i = 0; i < index; i++)
-        //        {
-        //            temp[i] = arr[i];
-        //        }
+	friend ostream& operator<<(ostream& out, const DynamicArray& obj) {
+		for (int i = 0; i < obj.size; i++) {
+			out << obj.arr[i] << " ";
+		}
+		return out;
+	}
+};
 
-        //        for (size_t i = index; i < size; i++) {
-        //            temp[i - 1] = arr[i + 1];
-        //        }
-        //        delete[]arr;
-        //        arr = temp;
-        //        size--;
-        //        temp = nullptr;
-        //    }
-        //}
+void main() {
+	DynamicArray<int> arr;
+	arr.AddElementToHead(1);
+	arr.AddElementToHead(12);
+	arr.AddElementToEnd(13412);
+	arr.AddElementToHead(142);
 
+	arr.AddElementByIndex(2, 1234);
 
-    void print() const {
-        if (size == 0) {
-            cout << "{}";
-        }
-        else {
-         
-            cout << arr[0];
-            for (int i = 1; i < size; ++i) { 
-                cout << ", " << arr[i];
-            }
-      
-        }
-    }
-
-    void println() const {
-        print();
-        cout << "\n";
-    }
-
-    void append(int x) {
-        if (size >= capacity) {
-            capacity = 2 * capacity;          
-            int* new_arr = new int[capacity]; 
-        
-
-            for (int i = 0; i < size; ++i) {  
-                new_arr[i] = arr[i];          
-            }
-
-            delete[] arr;                     
-
-            arr = new_arr;                    
-        }
-        assert(size < capacity);
-        arr[size] = x;
-        size++;
-    }
-
-}; 
-
-int main() {
-    cout << "Array : " << endl;
-    int_vec v;
-    v.println();
-    cout << endl;
-    cout << "Array after append elements : " << endl;
-    for (int i = 0; i < 25; ++i) {
-        v.append(i);
-    }
-    v.println();
-    cout << "Adding element to end : " << endl;
-    v.addElementToEnd(15) ;
-    v.println();
-    cout << "Adding element to start : " << endl;
-    v.addElementToStart(15);
-    v.println();
-
-    cout << "Add element by index : " << endl;
-    v.AddElementByIndex(150,9);
-    v.println();
-
-/*    cout << "Delete element by index : " << endl; 
-    v.DeleteElementByIndex(3);
-    v.println()*/;
+	cout << arr;
 }
- 
-
-
-
-
-
-
-
-
-
